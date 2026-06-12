@@ -270,6 +270,15 @@ tbody tr:hover td{background:#fffbea}
         </div>
       </div>
 
+      <!-- 离职失效演示 -->
+      <div class="pcard" style="border:1px solid #fca5a5">
+        <div class="pcard-title">🔒 离职失效演示</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.7">
+          点击下方按钮模拟员工离职场景：员工端名片显示失效遮罩，客户端 H5 同步显示「该名片已失效」提示页，所有操作按钮禁用。
+        </div>
+        <button id="deactivate-btn" class="btn btn-r" style="width:100%" onclick="toggleDeactivate()">🔒 模拟离职失效</button>
+      </div>
+
       <div class="pcard" id="apv-progress-card" style="display:none">
         <div class="pcard-title">⏳ 审批进度</div>
         <div style="font-size:13px;color:#888;line-height:1.9" id="apv-progress-text"></div>
@@ -307,8 +316,9 @@ tbody tr:hover td{background:#fffbea}
           <div class="h5-contacts">
             <div class="h5-row">
               <div class="h5-icon ic-tel">📞</div>
-              <div style="flex:1"><div class="h5-row-lbl" id="lbl-tel">电话</div><div class="h5-row-val">138-8888-8888</div></div>
+              <div style="flex:1"><div class="h5-row-lbl" id="lbl-tel">电话</div><div class="h5-row-val"><a href="tel:138-8888-8888" style="color:#333;text-decoration:none">138-8888-8888</a></div></div>
               <button class="h5-copy" onclick="copyText('138-8888-8888','电话已复制')">复制</button>
+              <a href="tel:138-8888-8888" style="margin-left:6px;font-size:11px;color:#16a34a;border:1px solid #bbf7d0;border-radius:4px;padding:2px 7px;text-decoration:none;font-family:inherit">拨号</a>
             </div>
             <div class="h5-row">
               <div class="h5-icon ic-mail">📧</div>
@@ -326,8 +336,8 @@ tbody tr:hover td{background:#fffbea}
             </div>
           </div>
           <div class="h5-btns">
-            <button class="h5-btn h5-btn-y" onclick="toast('联系人已存入通讯录 ✅')">📱 存入通讯录</button>
-            <button class="h5-btn h5-btn-w" onclick="toast('名片图片已保存（含动态水印）')">💾 保存名片图片</button>
+            <button class="h5-btn h5-btn-y" onclick="saveVCard()">📱 存入通讯录</button>
+            <button class="h5-btn h5-btn-w" onclick="saveCardImage()">💾 保存名片图片</button>
             <button class="h5-btn h5-btn-w" onclick="openModal('exchangeModal')">🤝 回传我的名片</button>
           </div>
         </div>
@@ -461,6 +471,7 @@ tbody tr:hover td{background:#fffbea}
               <input class="search-input" id="search-name" placeholder="搜索姓名/工号" oninput="filterTable()">
               <select class="fsel" id="filter-status" onchange="filterTable()"><option value="">全部状态</option><option>已生效</option><option>待审批</option><option>已驳回</option></select>
               <select class="fsel" id="filter-type" onchange="filterTable()"><option value="">全部类型</option><option>职位变更</option><option>英文姓名</option><option>境外名片</option></select>
+              <button class="btn btn-g" style="padding:6px 12px;flex:none;font-size:12px" onclick="exportTableCSV()">⬇️ 导出 CSV</button>
             </div>
           </div>
           <table>
@@ -485,6 +496,7 @@ tbody tr:hover td{background:#fffbea}
             <div class="filters">
               <select class="fsel" id="filter-emp" onchange="filterTracking()"><option value="">全部员工</option><option>刘晓雅</option><option>韩宇皓</option><option>余青鸟</option><option>姜华</option></select>
               <select class="fsel" id="filter-src" onchange="filterTracking()"><option value="">全部来源</option><option>微信扫码</option><option>企业微信</option><option>系统浏览器</option></select>
+              <button class="btn btn-g" style="padding:6px 12px;flex:none;font-size:12px" onclick="exportTrackingCSV()">⬇️ 导出 CSV</button>
             </div>
           </div>
           <table>
@@ -694,6 +706,20 @@ const store = {
 const templates = {
   A: {
     name: '模板 A · 美团标准',
+    renderEn: (f) => `
+      <div style="background:#fff;border-radius:12px;border:1px solid #eee;display:flex;overflow:hidden;min-height:150px">
+        <div style="flex:1;padding:16px">
+          <div style="font-size:13px;font-weight:800;color:#333;margin-bottom:8px">MEITUAN</div>
+          <div style="font-size:16px;font-weight:700;color:#222;margin-bottom:3px">${f.enName}</div>
+          <div style="font-size:10px;color:#777;margin-bottom:10px;line-height:1.5">${f.enTitle}<br>${f.dept}</div>
+          <div style="font-size:10px;color:#999;line-height:1.9">
+            <div>Tel: +86-138-8888-8888</div>
+            <div>Email: liuxiaoya07@meituan.com</div>
+            ${f.wx ? '<div>WeChat: ' + f.wx + '</div>' : ''}
+          </div>
+        </div>
+        <div style="width:72px;background:linear-gradient(160deg,#FFD100,#FFC000)"></div>
+      </div>`,
     renderCn: (f) => `
       <div style="background:linear-gradient(135deg,#FFD100,#FFC000);border-radius:12px;padding:18px 18px 14px;position:relative;overflow:hidden;min-height:170px">
         <div style="position:absolute;right:-18px;top:-18px;width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:50%"></div>
@@ -737,6 +763,19 @@ const templates = {
   },
   G: {
     name: '模板 G · 廉正专用',
+    renderEn: (f) => `
+      <div style="background:#fff;border-radius:12px;border:1px solid #c8e6c9;display:flex;overflow:hidden;min-height:150px">
+        <div style="flex:1;padding:16px">
+          <div style="font-size:13px;font-weight:800;color:#2e7d32;margin-bottom:8px">MEITUAN · Integrity</div>
+          <div style="font-size:16px;font-weight:700;color:#1b5e20;margin-bottom:3px">${f.enName}</div>
+          <div style="font-size:10px;color:#388e3c;margin-bottom:10px;line-height:1.5">${f.enTitle}<br>${f.dept}</div>
+          <div style="font-size:10px;color:#999;line-height:1.9">
+            <div>Tel: +86-138-8888-8888</div>
+            <div>Email: liuxiaoya07@meituan.com</div>
+          </div>
+        </div>
+        <div style="width:72px;background:linear-gradient(160deg,#c8e6c9,#a5d6a7)"></div>
+      </div>`,
     renderCn: (f) => `
       <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:12px;padding:18px;min-height:170px;position:relative">
         <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#2e7d32;margin-bottom:10px">美团 MEITUAN · 廉洁合规</div>
@@ -750,6 +789,19 @@ const templates = {
   },
   D: {
     name: '模板 D · 外卖事业部',
+    renderEn: (f) => `
+      <div style="background:#fff;border-radius:12px;border:1px solid #ffe0b2;display:flex;overflow:hidden;min-height:150px">
+        <div style="flex:1;padding:16px">
+          <div style="font-size:13px;font-weight:800;color:#e65100;margin-bottom:8px">MEITUAN WAIMAI</div>
+          <div style="font-size:16px;font-weight:700;color:#bf360c;margin-bottom:3px">${f.enName}</div>
+          <div style="font-size:10px;color:#e64a19;margin-bottom:10px;line-height:1.5">${f.enTitle}<br>${f.dept}</div>
+          <div style="font-size:10px;color:#999;line-height:1.9">
+            <div>Tel: +86-138-8888-8888</div>
+            <div>Email: liuxiaoya07@meituan.com</div>
+          </div>
+        </div>
+        <div style="width:72px;background:linear-gradient(160deg,#ffe0b2,#ffcc80)"></div>
+      </div>`,
     renderCn: (f) => `
       <div style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:12px;padding:18px;min-height:170px;position:relative">
         <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#e65100;margin-bottom:10px">美团外卖 MEITUAN WAIMAI</div>
@@ -762,6 +814,20 @@ const templates = {
   },
   I: {
     name: '模板 I · Keeta 高级',
+    renderEn: (f) => `
+      <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;display:flex;overflow:hidden;min-height:150px">
+        <div style="flex:1;padding:16px">
+          <div style="font-size:13px;font-weight:800;color:#FFD100;margin-bottom:8px">Keeta Premium</div>
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:3px">${f.enName}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:10px;line-height:1.5">${f.enTitle}<br>${f.dept}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.45);line-height:1.9">
+            <div>Tel: +86-138-8888-8888</div>
+            <div>Email: liuxiaoya07@meituan.com</div>
+            ${f.wa ? '<div>WhatsApp: ' + f.wa + '</div>' : ''}
+          </div>
+        </div>
+        <div style="width:72px;background:linear-gradient(160deg,#FFD100,rgba(255,209,0,0.3))"></div>
+      </div>`,
     renderCn: (f) => `
       <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:18px;min-height:170px;position:relative">
         <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#FFD100;margin-bottom:10px">Keeta Premium</div>
@@ -796,7 +862,7 @@ function renderEmployeeCard() {
   const isEn = store.cardTab === 'en';
   document.getElementById('card-ops').innerHTML = `
     <button class="op-btn" onclick="copyText('https://card.meituan.com/u/liuxiaoya07${isEn?'/en':''}','链接已复制')">🔗 复制链接</button>
-    <button class="op-btn" onclick="toast('名片图片已保存（含动态水印）')">💾 保存图片</button>
+    <button class="op-btn" onclick="saveCardImage()">💾 保存图片</button>
     <button class="op-btn primary" onclick="openModal('${isEn?'editEnModal':'editModal'}')">✏️ 编辑</button>
   `;
 }
@@ -987,13 +1053,55 @@ function submitEnEdit() {
   const entitle = document.getElementById('input-entitle').value.trim();
   const wa = document.getElementById('input-wa').value.trim();
   closeModal('editEnModal');
+
   // WhatsApp 直接生效
   if (wa) { store.fields.wa = wa; }
-  // 英文姓名/职位进入审批（这里 demo 直接生效以便演示）
-  if (enname) store.fields.enName = enname;
-  if (entitle) store.fields.enTitle = entitle;
+
+  // 英文姓名/职位进入审批 pending 状态，不直接写入
+  const hasApprovalChange = (enname && enname !== store.fields.enName) || (entitle && entitle !== store.fields.enTitle);
+  if (hasApprovalChange) {
+    if (enname) store.fields._pendingEnName = enname;
+    if (entitle) store.fields._pendingEnTitle = entitle;
+    store.fields.enNameStatus = 'pending';
+    // 在审批列表插入一条
+    addEnApvItem(enname, entitle);
+    // 显示审批进度
+    document.getElementById('apv-progress-card').style.display = 'block';
+    document.getElementById('apv-progress-text').innerHTML =
+      `📤 已提交境外名片变更申请<br>⏳ 等待直属主管审批<br>📌 审批期间名片继续展示旧版内容<br><span style="color:#16a34a;font-size:11px">💡 前往「审批流」页面可模拟审批操作</span>`;
+    toast('✅ WhatsApp 直接生效；英文姓名/职位已提交审批，等待主管确认');
+  } else {
+    toast('✅ WhatsApp 已保存');
+  }
   renderAll();
-  toast('✅ WhatsApp 直接生效；英文姓名/职位已提交审批');
+}
+
+function addEnApvItem(enname, entitle) {
+  const container = document.getElementById('apv-items');
+  const div = document.createElement('div');
+  div.className = 'apv-item';
+  div.dataset.name = '刘晓雅（本人）';
+  div.dataset.field = '英文姓名/职位';
+  div.dataset.old = store.fields.enName + ' / ' + store.fields.enTitle;
+  div.dataset.new = (enname || store.fields.enName) + ' / ' + (entitle || store.fields.enTitle);
+  div.dataset.storeKey = 'enNameTitle';
+  div.dataset.pendingEnName = enname || store.fields.enName;
+  div.dataset.pendingEnTitle = entitle || store.fields.enTitle;
+  div.innerHTML = `
+    <div class="apv-av" style="background:#e0e0e0">刘</div>
+    <div class="apv-info">
+      <div class="apv-name">刘晓雅 <span style="font-size:11px;color:#aaa;font-weight:400">本人提交</span></div>
+      <div class="apv-detail">申请修改：英文姓名/职位 → <strong>${div.dataset.new}</strong></div>
+    </div>
+    <div class="apv-time">刚刚</div>
+    <div class="apv-btns">
+      <button class="abtn-ok">通过</button>
+      <button class="abtn-no">驳回</button>
+    </div>`;
+  bindApvItem(div);
+  container.insertBefore(div, container.firstChild);
+  store.pendingCount++;
+  updateApvCount(0);
 }
 
 // ── 客户端：语言切换 ──
@@ -1051,6 +1159,13 @@ function doApprove() {
     document.getElementById('apv-progress-card').style.display = 'none';
   } else if (key === 'enName') {
     store.fields.enName = item.dataset.new;
+  } else if (key === 'enNameTitle') {
+    if (item.dataset.pendingEnName) store.fields.enName = item.dataset.pendingEnName;
+    if (item.dataset.pendingEnTitle) store.fields.enTitle = item.dataset.pendingEnTitle;
+    store.fields.enNameStatus = 'approved';
+    store.fields._pendingEnName = null;
+    store.fields._pendingEnTitle = null;
+    document.getElementById('apv-progress-card').style.display = 'none';
   }
 
   // 同步更新管理后台申请单状态
@@ -1208,9 +1323,225 @@ function filterTracking() {
   document.getElementById('track-empty').style.display = visible === 0 ? 'block' : 'none';
 }
 
+// ══════════════════════════════════════
+//  修复1：保存名片图片（Canvas 真实生成 + 下载）
+// ══════════════════════════════════════
+function saveCardImage() {
+  if (store.deactivated) { toast('名片已失效，无法保存'); return; }
+  const f = store.fields;
+  const isEn = store.cardTab === 'en';
+  const w = 600, h = 340;
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+
+  // 背景色（按模板）
+  const bgColors = { A:'#FFD100', F:'#FFD100', G:'#c8e6c9', D:'#ffe0b2', I:'#1a1a2e' };
+  ctx.fillStyle = bgColors[store.template] || '#FFD100';
+  ctx.fillRect(0, 0, w, h);
+
+  // 装饰圆
+  ctx.beginPath();
+  ctx.arc(w + 20, -20, 120, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fill();
+
+  // 品牌
+  const brandColors = { A:'rgba(0,0,0,0.5)', F:'rgba(0,0,0,0.5)', G:'#2e7d32', D:'#e65100', I:'#FFD100' };
+  ctx.fillStyle = brandColors[store.template] || 'rgba(0,0,0,0.5)';
+  ctx.font = 'bold 13px sans-serif';
+  const brand = store.template === 'I' ? 'Keeta Premium' : store.template === 'D' ? 'MEITUAN WAIMAI' : store.template === 'G' ? 'MEITUAN · 廉洁合规' : 'MEITUAN';
+  ctx.fillText(brand, 30, 44);
+
+  // 姓名
+  const nameColors = { A:'#222', F:'#222', G:'#1b5e20', D:'#bf360c', I:'#fff' };
+  ctx.fillStyle = nameColors[store.template] || '#222';
+  ctx.font = 'bold 34px sans-serif';
+  ctx.fillText(isEn ? f.enName : f.name, 30, 96);
+
+  // 职位+部门
+  const subColors = { A:'rgba(0,0,0,0.55)', F:'rgba(0,0,0,0.55)', G:'#388e3c', D:'#e64a19', I:'rgba(255,255,255,0.7)' };
+  ctx.fillStyle = subColors[store.template] || 'rgba(0,0,0,0.55)';
+  ctx.font = '15px sans-serif';
+  ctx.fillText((isEn ? f.enTitle : f.title) + '  ·  ' + f.dept, 30, 128);
+
+  // 联系信息
+  const infoColor = store.template === 'I' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.6)';
+  ctx.fillStyle = infoColor;
+  ctx.font = '13px sans-serif';
+  ctx.fillText('Tel: 138-8888-8888', 30, 172);
+  ctx.fillText('Email: liuxiaoya07@meituan.com', 30, 196);
+  ctx.fillText('Addr: 北京市朝阳区望京东路', 30, 220);
+  if (f.wx) ctx.fillText('WeChat: ' + f.wx, 30, 244);
+
+  // 动态水印（斜向）
+  ctx.save();
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate(-Math.PI / 8);
+  ctx.fillStyle = 'rgba(120,120,120,0.18)';
+  ctx.font = '15px sans-serif';
+  const now = new Date();
+  const ts = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0')
+           + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  ctx.fillText(ts + '  ·  仅供本人使用', -120, 0);
+  ctx.restore();
+
+  // 右下角二维码占位
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(w-70, h-70, 54, 54, 6) : ctx.rect(w-70, h-70, 54, 54);
+  ctx.fill();
+  ctx.fillStyle = '#aaa';
+  ctx.font = '9px sans-serif';
+  ctx.fillText('QR', w-52, h-40);
+  ctx.fillText('可失效', w-56, h-28);
+
+  // 触发下载
+  const dateStr = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+  const link = document.createElement('a');
+  link.download = '名片_' + (isEn ? f.enName : f.name) + '_' + dateStr + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  toast('✅ 名片图片已保存（含动态水印）');
+}
+
+// ══════════════════════════════════════
+//  修复2：存入通讯录（vCard 3.0 真实下载）
+// ══════════════════════════════════════
+function saveVCard() {
+  if (store.deactivated) { toast('名片已失效，无法保存'); return; }
+  const f = store.fields;
+  const isEn = store.h5Lang === 'en';
+  const name = isEn ? f.enName : f.name;
+  const title = isEn ? f.enTitle : f.title;
+  const vcard = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    'FN:' + name,
+    'N:' + (isEn ? f.enName.split(' ').reverse().join(';') : f.name + ';;;'),
+    'ORG:美团;' + f.dept,
+    'TITLE:' + title,
+    'TEL;TYPE=WORK,VOICE:138-8888-8888',
+    'EMAIL;TYPE=WORK:liuxiaoya07@meituan.com',
+    'ADR;TYPE=WORK:;;北京市朝阳区望京东路;;;;',
+    f.wx ? 'X-SOCIALPROFILE;type=wechat:' + f.wx : '',
+    f.wa ? 'X-SOCIALPROFILE;type=whatsapp:' + f.wa : '',
+    'END:VCARD'
+  ].filter(Boolean).join('\r\n');
+
+  const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name + '.vcf';
+  link.click();
+  URL.revokeObjectURL(url);
+  toast('✅ 通讯录文件已下载，请用手机导入');
+}
+
+// ══════════════════════════════════════
+//  修复4：离职失效演示
+// ══════════════════════════════════════
+function toggleDeactivate() {
+  store.deactivated = !store.deactivated;
+  renderAll();
+  renderDeactivateOverlay();
+  const btn = document.getElementById('deactivate-btn');
+  if (store.deactivated) {
+    btn.textContent = '🔓 恢复在职';
+    btn.className = 'btn btn-y';
+    toast('🔒 已模拟离职失效，名片对外不可见');
+  } else {
+    btn.textContent = '🔒 模拟离职失效';
+    btn.className = 'btn btn-r';
+    toast('✅ 已恢复在职状态');
+  }
+}
+
+function renderDeactivateOverlay() {
+  // 员工端遮罩
+  let empOverlay = document.getElementById('emp-deactivate-overlay');
+  if (!empOverlay) {
+    empOverlay = document.createElement('div');
+    empOverlay.id = 'emp-deactivate-overlay';
+    empOverlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.62);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:100;';
+    empOverlay.innerHTML = '<div style="font-size:40px;margin-bottom:10px">🔒</div><div style="color:#fff;font-size:16px;font-weight:700">名片已失效</div><div style="color:rgba(255,255,255,0.65);font-size:12px;margin-top:6px">员工已离职，T+1 自动失效</div>';
+    const cardShell = document.querySelector('.card-shell');
+    cardShell.style.position = 'relative';
+    cardShell.appendChild(empOverlay);
+  }
+  empOverlay.style.display = store.deactivated ? 'flex' : 'none';
+
+  // 客户端 H5 遮罩
+  let h5Overlay = document.getElementById('h5-deactivate-overlay');
+  if (!h5Overlay) {
+    h5Overlay = document.createElement('div');
+    h5Overlay.id = 'h5-deactivate-overlay';
+    h5Overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.72);border-radius:30px;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:100;';
+    h5Overlay.innerHTML = '<div style="font-size:44px;margin-bottom:12px">🔒</div><div style="color:#fff;font-size:15px;font-weight:700">该名片已失效</div><div style="color:rgba(255,255,255,0.65);font-size:12px;margin-top:8px">员工已离职，请联系其他同事</div>';
+    const phoneScreen = document.querySelector('.phone-screen');
+    phoneScreen.style.position = 'relative';
+    phoneScreen.appendChild(h5Overlay);
+  }
+  h5Overlay.style.display = store.deactivated ? 'flex' : 'none';
+}
+
+// ══════════════════════════════════════
+//  CSV 导出工具函数
+// ══════════════════════════════════════
+function downloadCSV(rows, filename) {
+  const bom = '\uFEFF'; // UTF-8 BOM，Excel 正确显示中文
+  const csv = bom + rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ CSV 已导出：' + filename);
+}
+
+function exportTableCSV() {
+  const headers = ['员工', '工号', '申请类型', '状态', '提交时间', '审批人'];
+  const rows = [headers];
+  document.querySelectorAll('#app-tbody tr').forEach(tr => {
+    if (tr.style.display === 'none') return;
+    const tds = tr.querySelectorAll('td');
+    rows.push([
+      tds[0].textContent.trim(),
+      tds[1].textContent.trim(),
+      tds[2].textContent.trim(),
+      tds[3].textContent.trim().replace(/^[✅⏳❌]\s*/, ''),
+      tds[4].textContent.trim(),
+      tds[5].textContent.trim(),
+    ]);
+  });
+  const now = new Date();
+  const ds = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+  downloadCSV(rows, '申请单列表_' + ds + '.csv');
+}
+
+function exportTrackingCSV() {
+  const headers = ['员工', '访问时间', '来源渠道', '访问地区'];
+  const rows = [headers];
+  document.querySelectorAll('#track-tbody tr').forEach(tr => {
+    if (tr.style.display === 'none') return;
+    const tds = tr.querySelectorAll('td');
+    rows.push([
+      tds[0].textContent.trim(),
+      tds[1].textContent.trim(),
+      tds[2].textContent.trim(),
+      tds[3].textContent.trim(),
+    ]);
+  });
+  const now = new Date();
+  const ds = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+  downloadCSV(rows, '访问追踪明细_' + ds + '.csv');
+}
+
 // ── 初始化渲染 ──
 renderAll();
 renderTplBar();
+renderDeactivateOverlay();
 </script>
 </body>
 </html>
