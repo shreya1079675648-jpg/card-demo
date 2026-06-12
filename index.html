@@ -270,6 +270,64 @@ tbody tr:hover td{background:#fffbea}
         </div>
       </div>
 
+      <!-- NFC 入口 -->
+      <div class="pcard" style="border:1px solid #dbeafe">
+        <div class="pcard-title">📡 NFC 近场传递 <span class="ptag p2">P2</span></div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.7">
+          将你的名片链接写入 NFC 贴纸，贴在手机背面或工牌上。<br>
+          客户手机靠近即可自动弹出名片页，无需扫码。
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <div style="flex:1;background:#eff6ff;border-radius:8px;padding:10px 12px;font-size:12px;color:#1d4ed8;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">📱</div>
+            <div style="font-weight:600">iOS 13+</div>
+            <div style="color:#93c5fd;font-size:11px">自动感应</div>
+          </div>
+          <div style="flex:1;background:#eff6ff;border-radius:8px;padding:10px 12px;font-size:12px;color:#1d4ed8;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">🤖</div>
+            <div style="font-weight:600">Android</div>
+            <div style="color:#93c5fd;font-size:11px">全版本支持</div>
+          </div>
+          <div style="flex:1;background:#f0fdf4;border-radius:8px;padding:10px 12px;font-size:12px;color:#15803d;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">🏷️</div>
+            <div style="font-weight:600">NFC 贴纸</div>
+            <div style="color:#86efac;font-size:11px">行政统一发放</div>
+          </div>
+        </div>
+        <div style="background:#f9f9f9;border-radius:8px;padding:9px 12px;font-size:11px;color:#aaa;margin-bottom:10px">
+          📎 写入链接：<span style="color:#d97706">https://card.meituan.com/u/liuxiaoya07</span>
+        </div>
+        <button class="btn btn-g" style="width:100%;font-size:12px" onclick="applyNFC()">📋 申请 NFC 贴纸</button>
+      </div>
+
+      <!-- 收到的名片 -->
+      <div class="pcard" style="border:1px solid #e9d5ff">
+        <div class="pcard-title">🤝 收到的名片 <span class="ptag p2">P2</span> <span id="received-badge" class="badge" style="background:#f3e8ff;color:#7c3aed;margin-left:6px">2 条</span></div>
+        <div id="received-list">
+          <div class="field-row" style="align-items:flex-start;padding:10px 0">
+            <div style="width:34px;height:34px;border-radius:50%;background:#e9d5ff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#7c3aed;flex-shrink:0;margin-right:10px">张</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:#222">张伟 <span style="font-size:11px;color:#aaa;font-weight:400">· 阿里巴巴</span></div>
+              <div style="font-size:11px;color:#999;margin-top:2px">高级产品经理 · 138-0000-1111</div>
+              <div style="font-size:10px;color:#bbb;margin-top:2px">2026-06-09 14:35 · 扫码后回传</div>
+            </div>
+            <button class="h5-copy" onclick="copyText('138-0000-1111','电话已复制')">复制</button>
+          </div>
+          <div class="field-row" style="align-items:flex-start;padding:10px 0">
+            <div style="width:34px;height:34px;border-radius:50%;background:#fce7f3;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#be185d;flex-shrink:0;margin-right:10px">李</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:#222">李明 <span style="font-size:11px;color:#aaa;font-weight:400">· 字节跳动</span></div>
+              <div style="font-size:11px;color:#999;margin-top:2px">商务总监 · 139-9999-2222</div>
+              <div style="font-size:10px;color:#bbb;margin-top:2px">2026-06-08 10:12 · 扫码后回传</div>
+            </div>
+            <button class="h5-copy" onclick="copyText('139-9999-2222','电话已复制')">复制</button>
+          </div>
+        </div>
+        <div style="text-align:center;padding:6px 0 2px">
+          <button class="lbtn" onclick="exportReceivedCSV()" style="font-size:12px;color:#7c3aed">⬇️ 导出收到的名片</button>
+        </div>
+      </div>
+
       <!-- 离职失效演示 -->
       <div class="pcard" style="border:1px solid #fca5a5">
         <div class="pcard-title">🔒 离职失效演示</div>
@@ -450,7 +508,7 @@ tbody tr:hover td{background:#fffbea}
           <div class="stat-box"><div class="stat-num">1,234</div><div class="stat-lbl">总激活人数</div><div class="stat-sub">↑ 较上月 +128</div></div>
           <div class="stat-box"><div class="stat-num" style="color:#d97706" id="stat-pending">56</div><div class="stat-lbl">待审批申请</div><div class="stat-sub" style="color:#d97706">需及时处理</div></div>
           <div class="stat-box"><div class="stat-num" style="color:#16a34a">8,920</div><div class="stat-lbl">本月打开次数</div><div class="stat-sub">↑ 较上月 +23%</div></div>
-          <div class="stat-box"><div class="stat-num" style="color:#dc2626">0</div><div class="stat-lbl">离职未失效</div><div class="stat-sub" style="color:#16a34a">✅ 全部已处理</div></div>
+          <div class="stat-box" style="cursor:pointer" onclick="showOffboardDetail()"><div class="stat-num" style="color:#dc2626" id="stat-offboard">0</div><div class="stat-lbl">离职未失效</div><div class="stat-sub" style="color:#16a34a" id="stat-offboard-sub">✅ 全部已处理</div></div>
         </div>
         <div class="tcard">
           <div class="tcard-hd"><div class="tcard-title">📊 访问来源分布（本月）</div></div>
@@ -663,6 +721,25 @@ tbody tr:hover td{background:#fffbea}
     <div class="modal-actions">
       <button class="btn btn-g" onclick="closeModal('exchangeModal')">取消</button>
       <button class="btn btn-y" onclick="submitExchange()">发送</button>
+    </div>
+  </div>
+</div>
+
+<!-- 离职未失效明细 Modal -->
+<div class="mask" id="offboardModal">
+  <div class="modal" style="width:520px">
+    <h3>🔒 离职未失效明细</h3>
+    <div style="font-size:12px;color:#aaa;margin-bottom:14px">以下员工已离职但名片尚未失效，请确认处理状态</div>
+    <table style="margin-bottom:12px">
+      <thead><tr><th>员工</th><th>工号</th><th>离职日期</th><th>状态</th><th>操作</th></tr></thead>
+      <tbody id="offboard-tbody">
+        <!-- 演示：当前全部已处理，点「模拟离职失效」后会新增一条 -->
+      </tbody>
+    </table>
+    <div id="offboard-empty" style="text-align:center;padding:24px;color:#ccc;font-size:13px">🎉 当前无待处理记录，全部已失效</div>
+    <div class="modal-actions">
+      <button class="btn btn-g" onclick="closeModal('offboardModal')">关闭</button>
+      <button class="btn btn-y" onclick="exportOffboardCSV()">⬇️ 导出 CSV</button>
     </div>
   </div>
 </div>
@@ -1440,23 +1517,8 @@ function saveVCard() {
 }
 
 // ══════════════════════════════════════
-//  修复4：离职失效演示
+//  修复4：离职失效演示（联动逻辑已移至 P2-3 区块）
 // ══════════════════════════════════════
-function toggleDeactivate() {
-  store.deactivated = !store.deactivated;
-  renderAll();
-  renderDeactivateOverlay();
-  const btn = document.getElementById('deactivate-btn');
-  if (store.deactivated) {
-    btn.textContent = '🔓 恢复在职';
-    btn.className = 'btn btn-y';
-    toast('🔒 已模拟离职失效，名片对外不可见');
-  } else {
-    btn.textContent = '🔒 模拟离职失效';
-    btn.className = 'btn btn-r';
-    toast('✅ 已恢复在职状态');
-  }
-}
 
 function renderDeactivateOverlay() {
   // 员工端遮罩
@@ -1536,6 +1598,153 @@ function exportTrackingCSV() {
   const now = new Date();
   const ds = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
   downloadCSV(rows, '访问追踪明细_' + ds + '.csv');
+}
+
+// ══════════════════════════════════════
+//  P2-1：NFC 申请
+// ══════════════════════════════════════
+function applyNFC() {
+  toast('📋 NFC 贴纸申请已提交，行政将在 3 个工作日内发放');
+}
+
+// ══════════════════════════════════════
+//  P2-2：收到的名片 — 双向交换员工侧
+// ══════════════════════════════════════
+function addReceivedCard(name, tel, company, pos) {
+  const list = document.getElementById('received-list');
+  const initial = name.charAt(0);
+  const colors = ['#fce7f3','#eff6ff','#f0fdf4','#fef9c3','#f3e8ff'];
+  const textColors = ['#be185d','#1d4ed8','#15803d','#854d0e','#7c3aed'];
+  const idx = list.children.length % colors.length;
+  const div = document.createElement('div');
+  div.className = 'field-row';
+  div.style.cssText = 'align-items:flex-start;padding:10px 0';
+  const now = new Date();
+  const ts = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0')
+           + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  div.innerHTML = `
+    <div style="width:34px;height:34px;border-radius:50%;background:${colors[idx]};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${textColors[idx]};flex-shrink:0;margin-right:10px">${initial}</div>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:600;color:#222">${name} <span style="font-size:11px;color:#aaa;font-weight:400">· ${company || '未填写'}</span></div>
+      <div style="font-size:11px;color:#999;margin-top:2px">${pos || '—'} · ${tel}</div>
+      <div style="font-size:10px;color:#bbb;margin-top:2px">${ts} · 扫码后回传</div>
+    </div>
+    <button class="h5-copy" onclick="copyText('${tel}','电话已复制')">复制</button>`;
+  list.insertBefore(div, list.firstChild);
+  const badge = document.getElementById('received-badge');
+  const count = list.children.length;
+  badge.textContent = count + ' 条';
+}
+
+function exportReceivedCSV() {
+  const rows = [['姓名', '公司', '职位', '电话', '回传时间']];
+  document.querySelectorAll('#received-list .field-row').forEach(row => {
+    const nameEl = row.querySelector('[style*="font-weight:600"]');
+    const name = nameEl ? nameEl.childNodes[0].textContent.trim() : '';
+    const company = nameEl ? (nameEl.querySelector('span')?.textContent?.replace('·','').trim() || '') : '';
+    const detailEl = row.querySelectorAll('div > div')[1];
+    const detail = detailEl ? detailEl.textContent : '';
+    const parts = detail.split('·');
+    const pos = parts[0]?.trim() || '';
+    const tel = parts[1]?.trim() || '';
+    const timeEl = row.querySelectorAll('div > div')[2];
+    const time = timeEl ? timeEl.textContent.split('·')[0].trim() : '';
+    rows.push([name, company, pos, tel, time]);
+  });
+  const now = new Date();
+  const ds = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+  downloadCSV(rows, '收到的名片_' + ds + '.csv');
+}
+
+// ══════════════════════════════════════
+//  P2-3：管理后台 — 离职未失效明细
+// ══════════════════════════════════════
+const offboardRecords = [];
+
+function showOffboardDetail() {
+  const tbody = document.getElementById('offboard-tbody');
+  tbody.innerHTML = '';
+  if (offboardRecords.length === 0) {
+    document.getElementById('offboard-empty').style.display = 'block';
+  } else {
+    document.getElementById('offboard-empty').style.display = 'none';
+    offboardRecords.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${r.name}</td><td>${r.mis}</td><td>${r.date}</td>
+        <td><span class="badge br">⚠️ 未失效</span></td>
+        <td><button class="lbtn" onclick="markOffboardDone(${i})">标记已处理</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  openModal('offboardModal');
+}
+
+function markOffboardDone(idx) {
+  offboardRecords.splice(idx, 1);
+  updateOffboardStat();
+  showOffboardDetail();
+  toast('✅ 已标记处理，名片将在 T+1 自动失效');
+}
+
+function updateOffboardStat() {
+  const count = offboardRecords.length;
+  document.getElementById('stat-offboard').textContent = count;
+  const sub = document.getElementById('stat-offboard-sub');
+  if (count === 0) {
+    sub.textContent = '✅ 全部已处理';
+    sub.style.color = '#16a34a';
+  } else {
+    sub.textContent = '⚠️ 需及时处理';
+    sub.style.color = '#dc2626';
+  }
+}
+
+function exportOffboardCSV() {
+  const rows = [['员工', '工号', '离职日期', '状态']];
+  if (offboardRecords.length === 0) {
+    rows.push(['（无待处理记录）', '', '', '']);
+  } else {
+    offboardRecords.forEach(r => rows.push([r.name, r.mis, r.date, '未失效']));
+  }
+  const now = new Date();
+  const ds = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+  downloadCSV(rows, '离职未失效明细_' + ds + '.csv');
+}
+
+// ── 联动：模拟离职失效时同步写入离职明细 ──
+function toggleDeactivate() {
+  store.deactivated = !store.deactivated;
+  renderAll();
+  renderDeactivateOverlay();
+  const btn = document.getElementById('deactivate-btn');
+  if (store.deactivated) {
+    btn.textContent = '🔓 恢复在职';
+    btn.className = 'btn btn-y';
+    toast('🔒 已模拟离职失效，名片对外不可见');
+    const now = new Date();
+    const ds = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+    offboardRecords.push({ name: '刘晓雅', mis: 'liuxiaoya07', date: ds });
+    updateOffboardStat();
+  } else {
+    btn.textContent = '🔒 模拟离职失效';
+    btn.className = 'btn btn-r';
+    toast('✅ 已恢复在职状态');
+    const idx = offboardRecords.findIndex(r => r.mis === 'liuxiaoya07');
+    if (idx !== -1) offboardRecords.splice(idx, 1);
+    updateOffboardStat();
+  }
+}
+
+// ── 联动：客户端回传后写入员工端「收到的名片」──
+function submitExchange() {
+  const name = document.getElementById('ex-name').value.trim();
+  const tel = document.getElementById('ex-tel').value.trim();
+  const company = document.getElementById('ex-company').value.trim();
+  const pos = document.getElementById('ex-pos').value.trim();
+  if (!name || !tel) { toast('请填写姓名和电话'); return; }
+  closeModal('exchangeModal');
+  addReceivedCard(name, tel, company, pos);
+  toast('✅ 已发送，对方将收到您的联系方式');
 }
 
 // ── 初始化渲染 ──
